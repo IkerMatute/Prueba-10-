@@ -1,0 +1,52 @@
+import random
+
+# Define las estadísticas iniciales
+vida_heroe = 10
+ataque_heroe = 2
+vida_monstruo = 15
+ataque_monstruo = 3
+
+# Empieza la batalla
+print("¡Comienza la batalla!")
+print("--------------------")
+
+# Bucle principal del juego
+while vida_heroe > 0 and vida_monstruo > 0:
+    print("\nTurno del héroe:")
+    print("¿Qué acción quieres tomar?")
+    print("1. Atacar")
+    print("2. Defender")
+
+    # Captura la entrada del jugador
+    while True:
+        try:
+            accion = int(input("Ingresa el número de la acción: "))
+            if accion in (1, 2):
+                break
+            else:
+                print("Ingresa un número válido (1 o 2).")
+        except ValueError:
+            print("Ingresa un número entero válido.")
+
+    # Acción del héroe
+    if accion == 1:
+        print("El héroe ataca al monstruo.")
+        danio = random.randint(ataque_heroe - 1, ataque_heroe + 1)  # Ataque con variación aleatoria
+        vida_monstruo -= danio
+        print(f"El héroe inflige {danio} de daño. Vida del monstruo restante: {vida_monstruo}")
+    elif accion == 2:
+        print("El héroe se defiende.")
+
+    # Acción del monstruo
+    if vida_monstruo > 0:
+        print("\nTurno del monstruo:")
+        danio_monstruo = random.randint(ataque_monstruo - 1, ataque_monstruo + 1)  # Ataque con variación aleatoria
+        vida_heroe -= danio_monstruo
+        print(f"El monstruo ataca al héroe, infligiendo {danio_monstruo} de daño. Vida del héroe restante: {vida_heroe}")
+
+# Determina el ganador
+print("\n--------------------")
+if vida_heroe <= 0:
+    print("¡El monstruo ha ganado!")
+else:
+    print("¡El héroe ha ganado!")
