@@ -1,0 +1,125 @@
+import random
+import time
+
+class Aventurero:
+    def __init__(self, nombre, vida, ataque, defensa):
+        self.nombre = nombre
+        self.vida_max = vida
+        self.vida = vida
+        self.ataque = ataque
+        self.defensa = defensa
+        self.defensa_actual = defensa # Para manejar la defensa temporal
+
+    def atacar(self, objetivo):
+        print(f"\n⚔️ {self.nombre} ataca a {objetivo.nombre}!")
+        
+        # Cálculo del daño con un poco de aleatoriedad y el efecto de la defensa del objetivo
+        # El daño mínimo es 1 si el ataque es mayor que la defensa
+        daño_base = self.ataque - objetivo.defensa_actual
+        daño = max(1, daño_base) # Asegura que siempre se haga al menos 1 de daño si hay ataque
+
+        objetivo.recibir_daño(daño)
+        print(f"💥 {objetivo.nombre} recibe {daño} puntos de daño.")
+        return daño
+
+    def recibir_daño(self, daño):
+        self.vida -= daño
+        if self.vida < 0:
+            self.vida = 0
+
+    def esta_vivo(self):
+        return self.vida > 0
+
+    def mostrar_estado(self):
+        print(f"✨ {self.nombre}: ❤️ {self.vida}/{self.vida_max} | 🗡️ Ataque: {self.ataque} | 🛡️ Defensa: {self.defensa}")
+
+def seleccionar_personaje_jugador():
+    personajes_disponibles = {
+        "1": Aventurero("Guerrero Valiente", 100, 15, 10),
+        "2": Aventurero("Mago Sabio", 80, 20, 5),
+        "3": Aventurero("Arquero Hábil", 90, 18, 8)
+    }
+
+    print("\n--- Elige tu Aventurero ---")
+    for key, pj in personajes_disponibles.items():
+        print(f"{key}. {pj.nombre} (Vida: {pj.vida_max}, Ataque: {pj.ataque}, Defensa: {pj.defensa})")
+
+    while True:
+        eleccion = input("Ingresa el número de tu elección: ").strip()
+        if eleccion in personajes_disponibles:
+            return personajes_disponibles[eleccion]
+        else:
+            print("Elección inválida. Por favor, ingresa un número válido.")
+
+def crear_oponente_ia():
+    nombres_oponentes = ["Orco Brutal", "Goblin Astuto", "Esqueleto Antiguo", "Lobo Feroz"]
+    nombre = random.choice(nombres_oponentes)
+    vida = random.randint(70, 120)
+    ataque = random.randint(12, 22)
+    defensa = random.randint(5, 12)
+    return Aventurero(nombre, vida, ataque, defensa)
+
+def jugar_duelo():
+    print("===============================")
+    print("⚔️ DUELO DE AVENTUREROS ⚔️")
+    print("===============================\n")
+
+    jugador = seleccionar_personaje_jugador()
+    oponente = crear_oponente_ia()
+
+    print(f"\n¡Has elegido a {jugador.nombre}! Tu oponente es {oponente.nombre}.")
+    print("¡Que comience el combate!\n")
+    time.sleep(1.5)
+
+    turno = 1
+    while jugador.esta_vivo() and oponente.esta_vivo():
+        print(f"\n--- Turno {turno} ---")
+        jugador.mostrar_estado()
+        oponente.mostrar_estado()
+
+        # Restablecer defensa al inicio del turno para ambos
+        jugador.defensa_actual = jugador.defensa
+        oponente.defensa_actual = oponente.defensa
+
+        # Turno del Jugador
+        print("\n¿Qué acción quieres realizar?")
+        print("1. Atacar")
+        print("2. Defender")
+        
+        while True:
+            accion = input("Elige una opción (1 o 2): ").strip()
+            if accion == "1":
+                jugador.atacar(oponente)
+                break
+            elif accion == "2":
+                print(f"🛡️ {jugador.nombre} se prepara para defender. Su defensa aumenta temporalmente.")
+                jugador.defensa_actual = jugador.defensa * 2
+                break
+            else:
+                print("Opción inválida. Por favor, elige 1 o 2.")
+        
+        if not oponente.esta_vivo():
+            break # Si el oponente muere, termina el combate
+
+        # Turno del Oponente (IA Básica)
+        print(f"\n--- Turno de {oponente.nombre} ---")
+        if random.random() < 0.8: # 80% de probabilidad de atacar
+            oponente.atacar(jugador)
+        else: # 20% de probabilidad de defender
+            print(f"🛡️ {oponente.nombre} decide defenderse y aumenta su defensa temporalmente.")
+            oponente.defensa_actual = oponente.defensa * 2
+        
+        time.sleep(2) # Pausa para leer los mensajes
+
+        turno += 1
+
+    print("\n===============================")
+    if jugador.esta_vivo():
+        print(f"🎉 ¡Felicidades, {jugador.nombre}! Has derrotado a {oponente.nombre}.")
+    else:
+        print(f"💀 ¡Has sido derrotado! {oponente.nombre} ha ganado el combate.")
+    print("===============================\n")
+
+# Iniciar el juego
+if __name__ == "__main__":
+    jugar_duelo()
