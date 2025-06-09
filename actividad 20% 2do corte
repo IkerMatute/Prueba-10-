@@ -1,0 +1,28 @@
+import numpy as np
+import pandas as pd
+
+np.random.seed(281)
+
+people = pd.DataFrame({"person_id": range(1, 7), "household_id": [1, 1, 2, 2, 3, 3]})
+
+purchases = pd.DataFrame(
+    {
+        "purchase_id": range(10),
+        "person_id": np.random.choice(people["person_id"], size=10),
+        "amount": np.round(np.random.normal(50, 10, size=10), 2),
+    }
+)
+
+# Unir los DataFrames purchases y people por 'person_id'
+merged_data = pd.merge(purchases, people, on="person_id")
+
+# Calcular la suma de los montos de compra por persona
+total_spent_per_person = merged_data.groupby(['person_id', 'household_id'])['amount'].sum().reset_index()
+
+# Calcular el promedio de compras por persona dentro de cada hogar
+household_spending_score = total_spent_per_person.groupby('household_id')['amount'].mean().reset_index()
+household_spending_score = household_spending_score.rename(columns={'amount': 'Puntaje de Gastos por Hogar'})
+
+
+print("Puntaje de Gastos por Hogar:")
+print(household_spending_score)
